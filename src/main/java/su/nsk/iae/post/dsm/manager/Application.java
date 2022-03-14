@@ -59,6 +59,6 @@ public class Application {
 		if (serverLauncher != null) {
 			serverLauncher.shutdown();
 			serverLauncher = null;
-			}
+		}
 	}
 }

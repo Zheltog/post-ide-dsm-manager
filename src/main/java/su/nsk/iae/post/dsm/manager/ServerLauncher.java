@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 
 public class ServerLauncher {
-	
 	private ServerThread serverThread;
 	
     public void start(final String host, final int port) {
