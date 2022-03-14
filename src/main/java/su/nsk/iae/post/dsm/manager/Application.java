@@ -28,23 +28,23 @@ public class Application {
 					host = args[i];
 			}
 		}
-        
-        try {
-        	serverLauncher = new ServerLauncher();
-            serverLauncher.start(host, port);
-            
-            Runtime.getRuntime().addShutdownHook(
-            		new Thread(() -> stop())
-            );
-            
-            System.out.println("PoST IDE DSM-manager: Application:\tinput anything to stop server...");
-            System.in.read();
-            stop();
-        } catch (Exception e) {
-        	System.out.println("PoST IDE DSM-manager: Application:\tgot exception...");
-            stop();
-            e.printStackTrace();
-        }
+		
+		try {
+			serverLauncher = new ServerLauncher();
+			serverLauncher.start(host, port);
+			
+			Runtime.getRuntime().addShutdownHook(
+					new Thread(() -> stop())
+			);
+			
+			System.out.println("PoST IDE DSM-manager: Application:\tinput anything to stop server...");
+			System.in.read();
+			stop();
+		} catch (Exception e) {
+			System.out.println("PoST IDE DSM-manager: Application:\tgot exception...");
+			stop();
+			e.printStackTrace();
+		}
 	}
 	
 	private static void help() {
@@ -53,12 +53,12 @@ public class Application {
 		System.out.println("\t-port (default 8080)");
 	}
 	
-    private static void stop() {
-    	System.out.println("PoST IDE DSM-manager: Application:\tclosing server...");
-    	
-        if (serverLauncher != null) {
-            serverLauncher.shutdown();
-            serverLauncher = null;
-        }
-    }
+	private static void stop() {
+		System.out.println("PoST IDE DSM-manager: Application:\tclosing server...");
+		
+		if (serverLauncher != null) {
+			serverLauncher.shutdown();
+			serverLauncher = null;
+			}
+	}
 }
