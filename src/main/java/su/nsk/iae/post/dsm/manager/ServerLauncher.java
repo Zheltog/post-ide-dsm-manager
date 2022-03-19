@@ -17,7 +17,7 @@ public class ServerLauncher {
 	private ServerThread serverThread;
 	
     public void start(final String host, final int port) {
-    	System.out.println("PoST IDE DSM-manager: ServerLauncher:\tstarting on " + host + ":" + port + "...");
+    	DSMManagerLogger.info(ServerLauncher.class, "starting on " + host + ":" + port + "...");
     	serverThread = new ServerThread(host, port);
     	serverThread.start();
     }
@@ -51,31 +51,34 @@ public class ServerLauncher {
     				.bind(new InetSocketAddress(host, port))) {
     			
     			while (shouldRun) {
-        			System.out.println("PoST IDE DSM-manager: ServerThread:\twaiting for request...");
+        			DSMManagerLogger.info(ServerLauncher.class, "waiting for request...");
     				socketChannel = serverSocket.accept().get();
-    				System.out.println("PoST IDE DSM-manager: ServerThread:\tgot request...");
-    				final Manager server = new Manager();
+					DSMManagerLogger.info(ServerLauncher.class, "got request...");
+    				final DSMManager server = new DSMManager();
     				final InputStream input = Channels.newInputStream(socketChannel);
     				final OutputStream output = Channels.newOutputStream(socketChannel);
-    				final Launcher<ManagerClient> launcher = Launcher.createIoLauncher(
-    						server, ManagerClient.class,
-                            input, output, threadPool, msg -> msg);
-    				final ManagerClient client = launcher.getRemoteProxy();
+    				final Launcher<DSMManagerClient> launcher = Launcher.createIoLauncher(
+    						server, DSMManagerClient.class,
+                            input, output, threadPool, msg -> msg
+					);
+    				final DSMManagerClient client = launcher.getRemoteProxy();
     				server.connect(client);
     				CompletableFuture.supplyAsync(() -> startLauncher(launcher)).thenRun(server::dispose);
-    				System.out.println("PoST IDE DSM-manager: ServerThread:\t connected client " + socketChannel.getRemoteAddress());
+					DSMManagerLogger.info(ServerLauncher.class, "connected client " + socketChannel.getRemoteAddress());
     			}
     		} catch (Exception e) {
-    			System.out.println("PoST IDE DSM-manager: ServerThread:\tgot error at accepting new client...");
+    			DSMManagerLogger.error(ServerLauncher.class, "got error at accepting new client...");
+				DSMManagerLogger.error(ServerLauncher.class, e.getMessage());
     			e.printStackTrace();
     		}
     	}
     	
-    	private Void startLauncher(final Launcher<ManagerClient> launcher) {
+    	private Void startLauncher(final Launcher<DSMManagerClient> launcher) {
             try {
             	return launcher.startListening().get();
             } catch (InterruptedException | ExecutionException e) {
-            	System.err.println("PoST IDE DSM-manager: ServerThread:\tgot error at accepting new client...");
+				DSMManagerLogger.error(ServerLauncher.class, "got error at accepting new client...");
+				DSMManagerLogger.error(ServerLauncher.class, e.getMessage());
             	e.printStackTrace();
             }
             return null;
@@ -87,16 +90,17 @@ public class ServerLauncher {
     		if (socketChannel != null) {
     			try {
     				socketChannel.close();
-    				System.out.println("PoST IDE DSM-manager: ServerThread:\tclosing...");
+					DSMManagerLogger.info(ServerLauncher.class, "closing...");
     			} catch (final IOException e) {
-    				System.out.println("PoST IDE DSM-manager: ServerThread:\tgot exception...");
+    				DSMManagerLogger.error(ServerLauncher.class, "got exception...");
+					DSMManagerLogger.error(ServerLauncher.class, e.getMessage());
     				e.printStackTrace();
     			}
     			if (threadPool != null) {
     				threadPool.shutdownNow();
     			}
     		} else {
-    			System.out.println("PoST IDE DSM-manager: ServerThread:\tgot no socket channel...");
+    			DSMManagerLogger.info(ServerLauncher.class, "got no socket channel...");
     		}
     	}
     }

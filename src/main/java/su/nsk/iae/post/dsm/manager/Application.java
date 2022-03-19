@@ -8,7 +8,7 @@ public class Application {
     private static ServerLauncher serverLauncher;
 	
 	public static void main(String[] args) {
-		System.out.println("PoST IDE DSM-manager: Application:\tuse -help to see available running configurations");
+		DSMManagerLogger.info(Application.class, "use -help to see available running configurations");
 		
 		String host = DEFAULT_HOST;
 		int port = DEFAULT_PORT;
@@ -37,24 +37,25 @@ public class Application {
 					new Thread(Application::stop)
 			);
 			
-			System.out.println("PoST IDE DSM-manager: Application:\tinput anything to stop server...");
+			DSMManagerLogger.info(Application.class, "input anything to stop server...");
 			System.in.read();
 			stop();
 		} catch (Exception e) {
-			System.out.println("PoST IDE DSM-manager: Application:\tgot exception...");
-			stop();
+			DSMManagerLogger.error(Application.class, "got exception...");
+			DSMManagerLogger.error(Application.class, e.getMessage());
 			e.printStackTrace();
+			stop();
 		}
 	}
 	
 	private static void help() {
-		System.out.println("PoST IDE DSM-manager: Application:\tavailable running configurations:");
-		System.out.println("\t-host (default \"localhost\")");
-		System.out.println("\t-port (default 8080)");
+		DSMManagerLogger.info(Application.class, "available running configurations:");
+		DSMManagerLogger.info(Application.class, "-host (default \"localhost\")");
+		DSMManagerLogger.info(Application.class, "-port (default 8080)");
 	}
 	
 	private static void stop() {
-		System.out.println("PoST IDE DSM-manager: Application:\tclosing server...");
+		DSMManagerLogger.info(Application.class, "closing server...");
 		
 		if (serverLauncher != null) {
 			serverLauncher.shutdown();
