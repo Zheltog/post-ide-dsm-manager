@@ -32,8 +32,8 @@ public class ServerLauncher {
     	private final String host;
     	private final int port;
     	
-    	private ExecutorService threadPool;
     	private boolean shouldRun = true;
+    	private ExecutorService threadPool;
     	private AsynchronousSocketChannel socketChannel;
     	
     	ServerThread(final String host, final int port) {
@@ -51,13 +51,35 @@ public class ServerLauncher {
     				.bind(new InetSocketAddress(host, port))) {
     			
     			while (shouldRun) {
-    				System.out.println("PoST IDE DSM-manager: ServerThread:\trunning...");
+        			System.out.println("PoST IDE DSM-manager: ServerThread:\twaiting for request...");
+    				socketChannel = serverSocket.accept().get();
+    				System.out.println("PoST IDE DSM-manager: ServerThread:\tgot request...");
+    				final Manager server = new Manager();
+    				final InputStream input = Channels.newInputStream(socketChannel);
+    				final OutputStream output = Channels.newOutputStream(socketChannel);
+    				final Launcher<ManagerClient> launcher = Launcher.createIoLauncher(
+    						server, ManagerClient.class,
+                            input, output, threadPool, msg -> msg);
+    				final ManagerClient client = launcher.getRemoteProxy();
+    				server.connect(client);
+    				CompletableFuture.supplyAsync(() -> startLauncher(launcher)).thenRun(server::dispose);
+    				System.out.println("PoST IDE DSM-manager: ServerThread:\t connected client " + socketChannel.getRemoteAddress());
     			}
     		} catch (Exception e) {
-    			System.out.println("PoST IDE DSM-manager: ServerThread:\tgot exception...");
+    			System.out.println("PoST IDE DSM-manager: ServerThread:\tgot error at accepting new client...");
     			e.printStackTrace();
     		}
     	}
+    	
+    	private Void startLauncher(final Launcher<ManagerClient> launcher) {
+            try {
+            	return launcher.startListening().get();
+            } catch (InterruptedException | ExecutionException e) {
+            	System.err.println("PoST IDE DSM-manager: ServerThread:\tgot error at accepting new client...");
+            	e.printStackTrace();
+            }
+            return null;
+        }
     	
     	private void shutdown() {
     		this.shouldRun = false;
