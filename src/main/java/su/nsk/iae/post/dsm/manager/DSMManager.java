@@ -2,15 +2,11 @@ package su.nsk.iae.post.dsm.manager;
 
 public class DSMManager {
 
-	public void manage() {
-		// TODO
-	}
+	public boolean isClientConnected = false;
 	
 	public void connect(DSMManagerClient client) {
-		// nothing to do -- no need to communicate to client for now
+		isClientConnected = true;
 	}
 	
-	public void dispose() {
-		// nothing to do
-	}
+	public void dispose() {}
 }

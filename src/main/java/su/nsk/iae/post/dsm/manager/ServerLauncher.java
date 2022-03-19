@@ -27,6 +27,10 @@ public class ServerLauncher {
     		serverThread.shutdown();
     	}
     }
+
+	public DSMManager getManager() {
+		return this.serverThread.manager;
+	}
     
     private static final class ServerThread extends Thread {
     	private final String host;
@@ -35,6 +39,7 @@ public class ServerLauncher {
     	private boolean shouldRun = true;
     	private ExecutorService threadPool;
     	private AsynchronousSocketChannel socketChannel;
+		private DSMManager manager;
     	
     	ServerThread(final String host, final int port) {
     		super("DSM-manager server");
@@ -54,16 +59,16 @@ public class ServerLauncher {
         			DSMManagerLogger.info(ServerLauncher.class, "waiting for request...");
     				socketChannel = serverSocket.accept().get();
 					DSMManagerLogger.info(ServerLauncher.class, "got request...");
-    				final DSMManager server = new DSMManager();
+    				this.manager = new DSMManager();
     				final InputStream input = Channels.newInputStream(socketChannel);
     				final OutputStream output = Channels.newOutputStream(socketChannel);
     				final Launcher<DSMManagerClient> launcher = Launcher.createIoLauncher(
-    						server, DSMManagerClient.class,
+							manager, DSMManagerClient.class,
                             input, output, threadPool, msg -> msg
 					);
     				final DSMManagerClient client = launcher.getRemoteProxy();
-    				server.connect(client);
-    				CompletableFuture.supplyAsync(() -> startLauncher(launcher)).thenRun(server::dispose);
+					manager.connect(client);
+    				CompletableFuture.supplyAsync(() -> startLauncher(launcher)).thenRun(manager::dispose);
 					DSMManagerLogger.info(ServerLauncher.class, "connected client " + socketChannel.getRemoteAddress());
     			}
     		} catch (Exception e) {
