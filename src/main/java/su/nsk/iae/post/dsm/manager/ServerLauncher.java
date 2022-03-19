@@ -28,7 +28,7 @@ public class ServerLauncher {
     	}
     }
     
-    private final class ServerThread extends Thread {
+    private static final class ServerThread extends Thread {
     	private final String host;
     	private final int port;
     	
@@ -87,7 +87,7 @@ public class ServerLauncher {
     		if (socketChannel != null) {
     			try {
     				socketChannel.close();
-    				System.out.println("PoST IDE DSM-manager: ServerThread:\\tclosing...");
+    				System.out.println("PoST IDE DSM-manager: ServerThread:\tclosing...");
     			} catch (final IOException e) {
     				System.out.println("PoST IDE DSM-manager: ServerThread:\tgot exception...");
     				e.printStackTrace();

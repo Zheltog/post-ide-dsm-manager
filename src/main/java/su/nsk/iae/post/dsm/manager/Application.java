@@ -34,7 +34,7 @@ public class Application {
 			serverLauncher.start(host, port);
 			
 			Runtime.getRuntime().addShutdownHook(
-					new Thread(() -> stop())
+					new Thread(Application::stop)
 			);
 			
 			System.out.println("PoST IDE DSM-manager: Application:\tinput anything to stop server...");

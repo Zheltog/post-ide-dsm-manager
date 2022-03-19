@@ -12,13 +12,19 @@ repositories {
 sourceSets {
 	main {
 		java {
-			java.srcDirs = ['src']
+			java.srcDirs = ['src/main/java']
 		}
 	}
+	test {
+        java {
+            java.srcDirs = ["src/test/java"]
+        }
+    }
 }
 
 dependencies {
 	implementation "org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc:0.9.0"
+	testImplementation 'junit:junit:4.13'
 }
 
 jar {
