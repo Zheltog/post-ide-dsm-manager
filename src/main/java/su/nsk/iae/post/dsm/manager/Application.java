@@ -24,13 +24,8 @@ public class Application {
 			}
 		}
 
-		try {
-			DSMMServerLauncher launcher = new DSMMServerLauncher();
-			launcher.start(port);
-		} catch (Exception e) {
-			DSMMLogger.error(Application.class, e.getMessage());
-			e.printStackTrace();
-		}
+		DSMMServerLauncher launcher = new DSMMServerLauncher();
+		launcher.start(port);
 	}
 	
 	private static void help() {

@@ -5,9 +5,9 @@ import su.nsk.iae.post.dsm.manager.server.DSMMServer;
 
 public class DSMMClientImpl implements DSMMClient {
 
-    public void start(DSMMServer server) throws Exception {
-        server.fetchMessages().get().forEach(this::accept);
-        server.postMessage(new Message("test"));
+    @Override
+    public void start(DSMMServer server) {
+        server.notifyAll(new Message("test"));
     }
 
     @Override

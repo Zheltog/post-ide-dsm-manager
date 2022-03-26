@@ -23,22 +23,21 @@ public class SocketLauncher<T> implements Launcher<T> {
 
     @Override
     public CompletableFuture<Void> startListening() {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                this.launcher.startListening().get();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }, Executors.newSingleThreadExecutor());
+        return CompletableFuture.runAsync(
+                () -> {
+                    try {
+                        this.launcher.startListening().get();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                Executors.newSingleThreadExecutor()
+        );
     }
 
     @Override
-    public T getRemoteProxy() {
-        return this.launcher.getRemoteProxy();
-    }
+    public T getRemoteProxy() { return this.launcher.getRemoteProxy(); }
 
     @Override
-    public RemoteEndpoint getRemoteEndpoint() {
-        return null;
-    }
+    public RemoteEndpoint getRemoteEndpoint() { return null; }
 }

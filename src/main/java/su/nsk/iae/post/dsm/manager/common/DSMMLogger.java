@@ -8,11 +8,11 @@ public class DSMMLogger {
 
     public static void info(Class c, String message) {
         System.out.println(c.getSimpleName() + ":\t" + message);
-        log.info(message);
+        log.info(c.getSimpleName() + ":\t" + message);
     }
 
     public static void error(Class c, String message) {
         System.out.println(c.getSimpleName() + ":\t" + message);
-        log.error(message);
+        log.error(c.getSimpleName() + ":\t" + message);
     }
 }
