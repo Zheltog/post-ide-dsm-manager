@@ -5,17 +5,12 @@ import su.nsk.iae.post.dsm.manager.server.DSMMServer;
 
 public class DSMMClientImpl implements DSMMClient {
 
-    private DSMMServer server;
-
-    public void start(DSMMServer server) {
+    public void start() {
         DSMMLogger.info(DSMMClientImpl.class, "starting...");
-        this.server = server;
     }
 
     @Override
-    public void removeFromServer() {
-        if (server != null) {
-            server.removeClient(this);
-        }
+    public void removeFromServer(DSMMServer server) {
+        server.removeClient(5);
     }
 }

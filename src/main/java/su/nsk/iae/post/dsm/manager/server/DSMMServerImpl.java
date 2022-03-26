@@ -23,8 +23,9 @@ public class DSMMServerImpl implements DSMMServer {
     }
 
     @Override
-    public void removeClient(DSMMClient client) {
-        this.clients.remove(client);
+    public CompletableFuture<Void> removeClient(int clientIndex) {
+        this.clients.remove(clientIndex);
         DSMMLogger.info(DSMMServerImpl.class, "client removed");
+        return completedFuture(null);
     }
 }

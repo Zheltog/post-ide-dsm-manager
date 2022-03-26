@@ -13,7 +13,7 @@ import static org.eclipse.lsp4j.jsonrpc.Launcher.createLauncher;
 public class DSMMClientLauncher {
 
     private AsynchronousSocketChannel socketChannel;
-
+    private DSMMServer server;
     private final DSMMClientImpl client;
 
     public DSMMClientLauncher(DSMMClientImpl client) {
@@ -45,17 +45,25 @@ public class DSMMClientLauncher {
                     newInputStream(socketChannel),
                     newOutputStream(socketChannel)
             );
-            final DSMMServer server = launcher.getRemoteProxy();
+            server = launcher.getRemoteProxy();
             DSMMLogger.info(DSMMClientLauncher.class, "successfully got server proxy");
-            client.start(server);
+            client.start();
         } catch (Exception e) {
             DSMMLogger.error(DSMMClientLauncher.class, e.getMessage());
+            stop();
         }
     }
 
     public void stop() {
         DSMMLogger.info(DSMMClientLauncher.class, "stopping...");
         try {
+            if (client != null) {
+                client.removeFromServer(server);
+                DSMMLogger.info(
+                        DSMMClientLauncher.class,
+                        "removed client from server's clients list"
+                );
+            }
             if (socketChannel != null && socketChannel.isOpen()) {
                 socketChannel.close();
                 DSMMLogger.info(
@@ -66,13 +74,6 @@ public class DSMMClientLauncher {
                 DSMMLogger.info(
                         DSMMClientLauncher.class,
                         "socket channel was not open"
-                );
-            }
-            if (client != null) {
-                client.removeFromServer();
-                DSMMLogger.info(
-                        DSMMClientLauncher.class,
-                        "removed client from server's clients list"
                 );
             }
         } catch (Exception e) {
