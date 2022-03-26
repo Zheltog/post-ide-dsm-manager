@@ -29,14 +29,24 @@ public class Application {
 			}
 		}
 		
+		start(host, port);
+	}
+	
+	private static void help() {
+		DSMManagerLogger.info(Application.class, "available running configurations:");
+		DSMManagerLogger.info(Application.class, "-host (default \"localhost\")");
+		DSMManagerLogger.info(Application.class, "-port (default 8080)");
+	}
+
+	private static void start(String host, int port) {
 		try {
 			serverLauncher = new ServerLauncher();
 			serverLauncher.start(host, port);
-			
+
 			Runtime.getRuntime().addShutdownHook(
 					new Thread(Application::stop)
 			);
-			
+
 			DSMManagerLogger.info(Application.class, "input anything to stop server...");
 			System.in.read();
 			stop();
@@ -46,12 +56,6 @@ public class Application {
 			e.printStackTrace();
 			stop();
 		}
-	}
-	
-	private static void help() {
-		DSMManagerLogger.info(Application.class, "available running configurations:");
-		DSMManagerLogger.info(Application.class, "-host (default \"localhost\")");
-		DSMManagerLogger.info(Application.class, "-port (default 8080)");
 	}
 	
 	private static void stop() {
