@@ -1,4 +1,4 @@
-package su.nsk.iae.post.dsm.manager;
+package su.nsk.iae.post.dsm.manager.common;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -10,7 +10,7 @@ public class ServerUtils {
             socket.setReuseAddress(true);
             return socket.getLocalPort();
         } catch (IOException e) {
-            DSMManagerLogger.error(ServerUtils.class, e.getMessage());
+            DSMMLogger.error(ServerUtils.class, e.getMessage());
         }
         throw new IllegalStateException("Could not find a free TCP/IP port");
     }

@@ -1,16 +1,15 @@
 package su.nsk.iae.post.dsm.manager;
 
+import su.nsk.iae.post.dsm.manager.common.DSMMLogger;
+import su.nsk.iae.post.dsm.manager.server.DSMMServerLauncher;
+
 public class Application {
-	
-    private static final String DEFAULT_HOST = "localhost";
+
     private static final int DEFAULT_PORT = 8080;
-    
-    private static ServerLauncher serverLauncher;
 	
 	public static void main(String[] args) {
-		DSMManagerLogger.info(Application.class, "use -help to see available running configurations");
-		
-		String host = DEFAULT_HOST;
+		DSMMLogger.info(Application.class, "use -help to see available running configurations");
+
 		int port = DEFAULT_PORT;
 		
 		for (int i = 0; i < args.length; i++) {
@@ -22,48 +21,20 @@ public class Application {
 				case "-port":
 					i++;
 					port = Integer.parseInt(args[i]);
-					break;
-				case "-host":
-					i++;
-					host = args[i];
 			}
 		}
-		
-		start(host, port);
+
+		try {
+			DSMMServerLauncher launcher = new DSMMServerLauncher();
+			launcher.start(port);
+		} catch (Exception e) {
+			DSMMLogger.error(Application.class, e.getMessage());
+			e.printStackTrace();
+		}
 	}
 	
 	private static void help() {
-		DSMManagerLogger.info(Application.class, "available running configurations:");
-		DSMManagerLogger.info(Application.class, "-host (default \"localhost\")");
-		DSMManagerLogger.info(Application.class, "-port (default 8080)");
-	}
-
-	private static void start(String host, int port) {
-		try {
-			serverLauncher = new ServerLauncher();
-			serverLauncher.start(host, port);
-
-			Runtime.getRuntime().addShutdownHook(
-					new Thread(Application::stop)
-			);
-
-			DSMManagerLogger.info(Application.class, "input anything to stop server...");
-			System.in.read();
-			stop();
-		} catch (Exception e) {
-			DSMManagerLogger.error(Application.class, "got exception...");
-			DSMManagerLogger.error(Application.class, e.getMessage());
-			e.printStackTrace();
-			stop();
-		}
-	}
-	
-	private static void stop() {
-		DSMManagerLogger.info(Application.class, "closing server...");
-		
-		if (serverLauncher != null) {
-			serverLauncher.shutdown();
-			serverLauncher = null;
-		}
+		DSMMLogger.info(Application.class, "available running configurations:");
+		DSMMLogger.info(Application.class, "-port (default 8080)");
 	}
 }
