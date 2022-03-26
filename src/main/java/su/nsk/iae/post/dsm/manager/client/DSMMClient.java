@@ -8,5 +8,8 @@ import su.nsk.iae.post.dsm.manager.server.DSMMServer;
 public interface DSMMClient {
 
     @JsonNotification
+    void setIndex(int index);
+
+    @JsonNotification
     void removeFromServer(DSMMServer server);
 }

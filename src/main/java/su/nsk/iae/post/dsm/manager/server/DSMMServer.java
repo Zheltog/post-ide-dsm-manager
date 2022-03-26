@@ -16,6 +16,6 @@ public interface DSMMServer {
     @JsonNotification
     void addClient(DSMMClient client);
 
-    @JsonRequest
-    CompletableFuture<Void> removeClient(int clientIndex);
+    @JsonNotification
+    void removeClient(int clientIndex);
 }
