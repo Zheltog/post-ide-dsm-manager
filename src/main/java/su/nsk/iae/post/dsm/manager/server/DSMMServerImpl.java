@@ -18,8 +18,8 @@ public class DSMMServerImpl implements DSMMServer {
     }
 
     public Runnable addClient(DSMMClient client) {
-        DSMMLogger.info(DSMMServerImpl.class, "adding new client...");
         this.clients.add(client);
+        DSMMLogger.info(DSMMServerImpl.class, "added new client");
         return () -> this.clients.remove(client);
     }
 }
