@@ -2,6 +2,7 @@ package su.nsk.iae.post.dsm.manager.client;
 
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import su.nsk.iae.post.dsm.manager.common.DSMMLogger;
+import su.nsk.iae.post.dsm.manager.common.ServerUtils;
 import su.nsk.iae.post.dsm.manager.server.DSMMServer;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -15,6 +16,10 @@ public class DSMMClientLauncher {
 
     public DSMMClientLauncher(DSMMClient client) {
         this.client = client;
+    }
+
+    public void start(String serverHost, int serverPort) {
+        start(serverHost, serverPort, "localhost", ServerUtils.findFreePort());
     }
 
     public void start(String serverHost, int serverPort, String clientHost, int clientPort) {

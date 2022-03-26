@@ -1,15 +1,15 @@
 package su.nsk.iae.post.dsm.manager;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 import su.nsk.iae.post.dsm.manager.client.DSMMClient;
 import su.nsk.iae.post.dsm.manager.client.DSMMClientLauncher;
 import su.nsk.iae.post.dsm.manager.server.DSMMServerLauncher;
 import static java.lang.Thread.sleep;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class ServerLauncherTest {
+public class LaunchersTest {
 
     @Test
     public void testConnection() {
@@ -25,7 +25,7 @@ public class ServerLauncherTest {
 
             new Thread(() -> {
                 DSMMClientLauncher cl = new DSMMClientLauncher(client);
-                cl.start("127.0.0.1", 8080, "127.0.0.1", 8085);
+                cl.start("127.0.0.1", 8080);
             }).start();
 
             sleep(3000);
@@ -33,6 +33,7 @@ public class ServerLauncherTest {
             verify(client, times(1)).start(any());
         } catch (Exception e) {
             e.printStackTrace();
+            fail();
         }
     }
 }
