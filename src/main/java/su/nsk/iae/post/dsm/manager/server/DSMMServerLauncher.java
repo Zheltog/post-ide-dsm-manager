@@ -7,10 +7,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
-import java.util.concurrent.CompletableFuture;
 import static java.nio.channels.Channels.newInputStream;
 import static java.nio.channels.Channels.newOutputStream;
-import static java.util.concurrent.Executors.newCachedThreadPool;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 public class DSMMServerLauncher {
 
@@ -40,15 +39,14 @@ public class DSMMServerLauncher {
                 DSMMLogger.info(DSMMServerLauncher.class, "waiting for connection...");
                 AsynchronousSocketChannel socketChannel = serverSocketChannel.accept().get();
                 DSMMLogger.info(DSMMServerLauncher.class, "accepted new connection");
-                final Launcher<DSMMClient> launcher = Launcher.createIoLauncher(
+                final Launcher<DSMMClient> launcher = Launcher.createLauncher(
                         server, DSMMClient.class,
                         newInputStream(socketChannel),
-                        newOutputStream(socketChannel),
-                        newCachedThreadPool(), msg -> msg
+                        newOutputStream(socketChannel)
                 );
                 final DSMMClient client = launcher.getRemoteProxy();
                 DSMMLogger.info(DSMMServerLauncher.class, "successfully got client proxy");
-                CompletableFuture.supplyAsync(launcher::startListening)
+                supplyAsync(launcher::startListening)
                         .thenRun(() -> server.addClient(client));
             }
         } catch (Exception e) {

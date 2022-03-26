@@ -8,13 +8,15 @@ import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousSocketChannel;
 import static java.nio.channels.Channels.newInputStream;
 import static java.nio.channels.Channels.newOutputStream;
-import static java.util.concurrent.Executors.newCachedThreadPool;
+import static org.eclipse.lsp4j.jsonrpc.Launcher.createLauncher;
 
 public class DSMMClientLauncher {
 
-    private final DSMMClient client;
+    private AsynchronousSocketChannel socketChannel;
 
-    public DSMMClientLauncher(DSMMClient client) {
+    private final DSMMClientImpl client;
+
+    public DSMMClientLauncher(DSMMClientImpl client) {
         this.client = client;
     }
 
@@ -25,10 +27,10 @@ public class DSMMClientLauncher {
     public void start(String serverHost, int serverPort, String clientHost, int clientPort) {
         DSMMLogger.info(DSMMClientLauncher.class, "starting...");
 
-        try (AsynchronousSocketChannel socketChannel = AsynchronousSocketChannel
-                .open()
-                .bind(new InetSocketAddress(clientHost, clientPort))
-        ) {
+        try {
+            this.socketChannel = AsynchronousSocketChannel
+                    .open()
+                    .bind(new InetSocketAddress(clientHost, clientPort));
             DSMMLogger.info(
                     DSMMClientLauncher.class,
                     "successfully created socket channel for " + clientHost + ":" + clientPort
@@ -38,15 +40,41 @@ public class DSMMClientLauncher {
                     DSMMClientLauncher.class,
                     "successfully connected to server on " + serverHost + ":" + serverPort
             );
-            final Launcher<DSMMServer> launcher = Launcher.createIoLauncher(
+            final Launcher<DSMMServer> launcher = createLauncher(
                     client, DSMMServer.class,
                     newInputStream(socketChannel),
-                    newOutputStream(socketChannel),
-                    newCachedThreadPool(), msg -> msg
+                    newOutputStream(socketChannel)
             );
             final DSMMServer server = launcher.getRemoteProxy();
             DSMMLogger.info(DSMMClientLauncher.class, "successfully got server proxy");
             client.start(server);
+        } catch (Exception e) {
+            DSMMLogger.error(DSMMClientLauncher.class, e.getMessage());
+        }
+    }
+
+    public void stop() {
+        DSMMLogger.info(DSMMClientLauncher.class, "stopping...");
+        try {
+            if (socketChannel != null && socketChannel.isOpen()) {
+                socketChannel.close();
+                DSMMLogger.info(
+                        DSMMClientLauncher.class,
+                        "socket channel closed successfully"
+                );
+            } else {
+                DSMMLogger.info(
+                        DSMMClientLauncher.class,
+                        "socket channel was not open"
+                );
+            }
+            if (client != null) {
+                client.removeFromServer();
+                DSMMLogger.info(
+                        DSMMClientLauncher.class,
+                        "removed client from server's clients list"
+                );
+            }
         } catch (Exception e) {
             DSMMLogger.error(DSMMClientLauncher.class, e.getMessage());
         }

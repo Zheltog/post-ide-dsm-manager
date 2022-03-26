@@ -1,8 +1,11 @@
 package su.nsk.iae.post.dsm.manager.client;
 
-import su.nsk.iae.post.dsm.manager.server.DSMMServer;
+import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
+import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 
+@JsonSegment("client")
 public interface DSMMClient {
 
-    void start(DSMMServer server);
+    @JsonNotification
+    void removeFromServer();
 }
