@@ -1,7 +1,6 @@
 package su.nsk.iae.post.dsm.manager.server;
 
 import su.nsk.iae.post.dsm.manager.common.DSMMLogger;
-import su.nsk.iae.post.dsm.manager.common.Message;
 import su.nsk.iae.post.dsm.manager.client.DSMMClient;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -10,16 +9,14 @@ public class DSMMServerImpl implements DSMMServer {
 
     private final List<DSMMClient> clients = new CopyOnWriteArrayList<>();
 
-    public void notifyAll(Message message) {
-        DSMMLogger.info(DSMMServerImpl.class, "notifying everyone...");
-        for (DSMMClient client : clients) {
-            client.accept(message);
-        }
+    @Override
+    public List<DSMMClient> getClients() {
+        return clients;
     }
 
-    public Runnable addClient(DSMMClient client) {
+    @Override
+    public void addClient(DSMMClient client) {
         this.clients.add(client);
         DSMMLogger.info(DSMMServerImpl.class, "added new client");
-        return () -> this.clients.remove(client);
     }
 }

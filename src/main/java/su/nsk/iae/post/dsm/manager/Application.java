@@ -1,6 +1,7 @@
 package su.nsk.iae.post.dsm.manager;
 
 import su.nsk.iae.post.dsm.manager.common.DSMMLogger;
+import su.nsk.iae.post.dsm.manager.server.DSMMServerImpl;
 import su.nsk.iae.post.dsm.manager.server.DSMMServerLauncher;
 import java.io.IOException;
 
@@ -36,7 +37,7 @@ public class Application {
 			}
 		}
 
-		launcher = new DSMMServerLauncher();
+		launcher = new DSMMServerLauncher(new DSMMServerImpl());
 		final String finalHost = host;
 		final int finalPort = port;
 

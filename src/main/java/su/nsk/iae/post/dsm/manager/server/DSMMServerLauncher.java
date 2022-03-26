@@ -17,6 +17,12 @@ public class DSMMServerLauncher {
     private AsynchronousServerSocketChannel serverSocketChannel;
     private boolean shouldRun = true;
 
+    private final DSMMServer server;
+
+    public DSMMServerLauncher(DSMMServer server) {
+        this.server = server;
+    }
+
     public void start(String host, int port) {
         DSMMLogger.info(
                 DSMMServerLauncher.class,
@@ -30,7 +36,6 @@ public class DSMMServerLauncher {
                     DSMMServerLauncher.class,
                     "successfully created server socket channel for " + host + ":" + port
             );
-            DSMMServerImpl server = new DSMMServerImpl();
             while (shouldRun) {
                 DSMMLogger.info(DSMMServerLauncher.class, "waiting for connection...");
                 AsynchronousSocketChannel socketChannel = serverSocketChannel.accept().get();
@@ -44,7 +49,7 @@ public class DSMMServerLauncher {
                 final DSMMClient client = launcher.getRemoteProxy();
                 DSMMLogger.info(DSMMServerLauncher.class, "successfully got client proxy");
                 CompletableFuture.supplyAsync(launcher::startListening)
-                        .thenRun(server.addClient(client));
+                        .thenRun(() -> server.addClient(client));
             }
         } catch (Exception e) {
             DSMMLogger.error(DSMMServerLauncher.class, e.getMessage());
