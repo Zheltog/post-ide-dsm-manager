@@ -1,12 +1,20 @@
 package su.nsk.iae.post.dsm.manager.server;
 
+import com.google.gson.JsonObject;
+import org.eclipse.lsp4j.jsonrpc.validation.NonNull;
+import su.nsk.iae.post.dsm.manager.common.Logger;
+import su.nsk.iae.post.dsm.manager.common.Request;
+import su.nsk.iae.post.dsm.manager.common.Response;
+import su.nsk.iae.post.dsm.manager.common.ServerUtils;
 import java.io.*;
 import java.net.Socket;
+import java.util.LinkedList;
 import java.util.List;
+import static su.nsk.iae.post.dsm.manager.common.Response.ResponseType.*;
 
 public class ClientHandler implements Runnable {
 
-    private Socket client;
+    private final Socket client;
 
     public ClientHandler(Socket client) {
         this.client = client;
@@ -15,49 +23,76 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-            System.out.println("Thread started with name: " + Thread.currentThread().getName());
-            readResponse();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            logInfo("started");
+            BufferedReader request = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            BufferedWriter response = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
+            process(request, response, getContent(request));
+        } catch (IOException e) {
+            logError(e.getMessage());
         }
     }
 
-    private void readResponse() throws IOException, InterruptedException {
-        try {
-            BufferedReader request = new BufferedReader(new InputStreamReader(
-                    client.getInputStream()));
-            BufferedWriter response = new BufferedWriter(
-                    new OutputStreamWriter(client.getOutputStream()));
-
-            String requestHeader = "";
-            String temp = ".";
-            while (!temp.equals("")) {
-                temp = request.readLine();
-                requestHeader += temp + "\n";
-            }
-
-            if (requestHeader.split("\n")[0].contains("GET")) {
-                if (List.of(requestHeader.split("\n"))
-                        .contains("QUESTION: CONNECT_NEW_CLIENT")
-                ) {
-                    System.out.println("NEW CLIENT WANTS TO CONNECT");
-                }
-
-                StringBuilder sb = new StringBuilder();
-                sb.append("HTTP/1.1 200 OK\r\n");
-                sb.append("Server: localhost\r\n");
-                sb.append("Content-Type: json\r\n");
-                sb.append("Connection: Closed\r\n\r\n");
-                response.write(sb.toString());
-                sb.setLength(0);
-                response.flush();
-            }
-
-            request.close();
-            response.close();
-            client.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+    private List<String> getContent(BufferedReader request) throws IOException {
+        logInfo("reading request content...");
+        List<String> content = new LinkedList<>();
+        String str = ".";
+        while (!str.equals("")) {
+            str = request.readLine();
+            content.add(str);
         }
+        return content;
+    }
+
+    private void process(
+            BufferedReader requestReader,
+            BufferedWriter responseWriter,
+            List<String> requestContent
+    ) throws IOException {
+        logInfo("processing...");
+        if (requestContent.get(0).contains("GET")) {
+            for (Request request : Request.values()) {
+                if (requestContent.contains("REQUEST: " + request)) {
+                    responseWriter.write("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n");
+                    responseWriter.write(responseFor(request).toString());
+                    responseWriter.flush();
+                    finish(requestReader, responseWriter, client);
+                    return;
+                }
+            }
+            responseWriter.write("HTTP/1.1 404 NOT FOUND\r\n\r\n");
+            responseWriter.flush();
+            finish(requestReader, responseWriter, client);
+        }
+    }
+
+    @NonNull
+    private JsonObject responseFor(Request request) {
+        JsonObject json = new JsonObject();
+        switch (request) {
+            case NEW_MODULE:
+                Response a = new Response(FREE_PORT, ServerUtils.findFreePort());
+                json.addProperty(a.getType().toString(), (Integer) a.getValue());
+                break;
+        }
+        return json;
+    }
+
+    private void finish(
+            BufferedReader request,
+            BufferedWriter response,
+            Socket client
+    ) throws IOException {
+        logInfo("finishing...");
+        request.close();
+        response.close();
+        client.close();
+    }
+
+    private void logInfo(String message) {
+        Logger.info(ClientHandler.class, message);
+    }
+
+    private void logError(String message) {
+        Logger.error(ClientHandler.class, message);
     }
 }

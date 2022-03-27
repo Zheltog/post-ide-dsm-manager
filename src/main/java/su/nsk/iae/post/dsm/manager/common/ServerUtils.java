@@ -10,7 +10,7 @@ public class ServerUtils {
             socket.setReuseAddress(true);
             return socket.getLocalPort();
         } catch (IOException e) {
-            DSMMLogger.error(ServerUtils.class, e.getMessage());
+            Logger.error(ServerUtils.class, e.getMessage());
         }
         throw new IllegalStateException("Could not find a free TCP/IP port");
     }

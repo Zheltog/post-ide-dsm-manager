@@ -1,10 +1,8 @@
 package su.nsk.iae.post.dsm.manager.common;
 
-import org.apache.log4j.Logger;
+public class Logger {
 
-public class DSMMLogger {
-
-    private static final Logger log = Logger.getLogger(DSMMLogger.class);
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Logger.class);
 
     public static void info(Class c, String message) {
         System.out.println(c.getSimpleName() + ": " + message);
