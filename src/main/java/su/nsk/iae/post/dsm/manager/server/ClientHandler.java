@@ -67,6 +67,7 @@ public class ClientHandler implements Runnable {
 
     @NonNull
     private JsonObject responseFor(Request request) {
+        logInfo("preparing response for request: " + request + "...");
         JsonObject json = new JsonObject();
         switch (request) {
             case NEW_MODULE:
@@ -74,6 +75,7 @@ public class ClientHandler implements Runnable {
                 json.addProperty(a.getType().toString(), (Integer) a.getValue());
                 break;
         }
+        logInfo("built response: " + json);
         return json;
     }
 
