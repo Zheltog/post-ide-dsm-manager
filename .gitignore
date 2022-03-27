@@ -48,3 +48,6 @@ gradle-app.setting
 
 # idea
 .idea
+
+# bin
+bin

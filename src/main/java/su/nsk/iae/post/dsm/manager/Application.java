@@ -44,13 +44,13 @@ public class Application {
 		new Thread(() -> launcher.start(finalHost, finalPort)).start();
 
 		Runtime.getRuntime().addShutdownHook(
-				new Thread(Application::stop)
+				new Thread(launcher::stop)
 		);
 
 		try {
 			DSMMLogger.info(Application.class, "any input for stop");
 			System.in.read();
-			stop();
+			launcher.stop();
 		} catch (IOException e) {
 			DSMMLogger.error(Application.class, e.getMessage());
 		}
@@ -59,9 +59,5 @@ public class Application {
 	private static void help() {
 		DSMMLogger.info(Application.class, "available running configurations:");
 		DSMMLogger.info(Application.class, "-port (default 8080)");
-	}
-
-	private static void stop() {
-		launcher.stop();
 	}
 }

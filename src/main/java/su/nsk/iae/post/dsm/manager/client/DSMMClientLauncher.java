@@ -13,71 +13,67 @@ import static org.eclipse.lsp4j.jsonrpc.Launcher.createLauncher;
 public class DSMMClientLauncher {
 
     private AsynchronousSocketChannel socketChannel;
-    private DSMMServer server;
     private final DSMMClientImpl client;
 
     public DSMMClientLauncher(DSMMClientImpl client) {
         this.client = client;
     }
 
+    /**
+     * start launcher on localhost:any-available-port
+     * @param serverHost server hostname
+     * @param serverPort server port
+     */
     public void start(String serverHost, int serverPort) {
         start(serverHost, serverPort, "localhost", ServerUtils.findFreePort());
     }
 
+    /**
+     * start launcher on exact host:port
+     * @param serverHost server hostname
+     * @param serverPort server port
+     * @param clientHost client hostname
+     * @param clientPort client port
+     */
     public void start(String serverHost, int serverPort, String clientHost, int clientPort) {
-        DSMMLogger.info(DSMMClientLauncher.class, "starting...");
-
+        logInfo("starting...");
         try {
             this.socketChannel = AsynchronousSocketChannel
-                    .open()
-                    .bind(new InetSocketAddress(clientHost, clientPort));
-            DSMMLogger.info(
-                    DSMMClientLauncher.class,
-                    "successfully created socket channel for " + clientHost + ":" + clientPort
-            );
+                    .open().bind(new InetSocketAddress(clientHost, clientPort));
+            logInfo("successfully created socket channel for " + clientHost + ":" + clientPort);
             socketChannel.connect(new InetSocketAddress(serverHost, serverPort)).get();
-            DSMMLogger.info(
-                    DSMMClientLauncher.class,
-                    "successfully connected to server on " + serverHost + ":" + serverPort
-            );
+            logInfo("successfully connected to server on " + serverHost + ":" + serverPort);
             final Launcher<DSMMServer> launcher = createLauncher(
-                    client, DSMMServer.class,
-                    newInputStream(socketChannel),
-                    newOutputStream(socketChannel)
+                    client, DSMMServer.class, newInputStream(socketChannel), newOutputStream(socketChannel)
             );
-            server = launcher.getRemoteProxy();
-            DSMMLogger.info(DSMMClientLauncher.class, "successfully got server proxy");
+            final DSMMServer server = launcher.getRemoteProxy();
+            logInfo("successfully got server proxy");
             client.start();
         } catch (Exception e) {
-            DSMMLogger.error(DSMMClientLauncher.class, e.getMessage());
+            logError(e.getMessage());
             stop();
         }
     }
 
     public void stop() {
-        DSMMLogger.info(DSMMClientLauncher.class, "stopping...");
+        logInfo("stopping...");
         try {
-            if (client != null) {
-                client.removeFromServer(server);
-                DSMMLogger.info(
-                        DSMMClientLauncher.class,
-                        "removed client from server's clients list"
-                );
-            }
             if (socketChannel != null && socketChannel.isOpen()) {
                 socketChannel.close();
-                DSMMLogger.info(
-                        DSMMClientLauncher.class,
-                        "socket channel closed successfully"
-                );
+                logInfo("socket channel closed successfully");
             } else {
-                DSMMLogger.info(
-                        DSMMClientLauncher.class,
-                        "socket channel was not open"
-                );
+                logInfo("socket channel was not open");
             }
         } catch (Exception e) {
-            DSMMLogger.error(DSMMClientLauncher.class, e.getMessage());
+            logError(e.getMessage());
         }
+    }
+
+    private void logInfo(String message) {
+        DSMMLogger.info(DSMMClientLauncher.class, message);
+    }
+
+    private void logError(String message) {
+        DSMMLogger.error(DSMMClientLauncher.class, message);
     }
 }
