@@ -14,35 +14,6 @@ import static org.mockito.Mockito.verify;
 public class LaunchersTest {
 
     @Test
-    public void testCommunicationWithOneClient() {
-        try {
-            DSMMServerImpl server = new DSMMServerImpl();
-            DSMMClientImpl client = Mockito.mock(DSMMClientImpl.class);
-            DSMMClientLauncher cl = new DSMMClientLauncher(client);
-
-            new Thread(() -> {
-                DSMMServerLauncher sl = new DSMMServerLauncher(server);
-                sl.start("127.0.0.1", 8080);
-            }).start();
-            sleep(2000);
-
-            new Thread(() -> cl.start("127.0.0.1", 8080))
-                    .start();
-            sleep(2000);
-
-            verify(client, times(1)).start();
-
-            assertEquals(server.getClients().size(), 1);
-            cl.stop();
-            sleep(2000);
-            assertEquals(server.getClients().size(), 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
     public void testCommunicationWithTwoClients() {
         try {
             DSMMServerImpl server = new DSMMServerImpl();
