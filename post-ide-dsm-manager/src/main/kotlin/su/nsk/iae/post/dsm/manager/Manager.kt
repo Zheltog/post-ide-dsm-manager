@@ -2,6 +2,11 @@ package su.nsk.iae.post.dsm.manager
 
 import su.nsk.iae.post.dsm.manager.common.Logger
 import su.nsk.iae.post.dsm.manager.common.ServerUtils
+import java.net.ProxySelector
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse.BodyHandlers
 
 object Manager {
 
@@ -16,7 +21,26 @@ object Manager {
     }
 
     fun getModules(): List<Module> {
-        // TODO: для каждого модуля нужно проверить, жив ли он
+        checkModules()
         return modules
+    }
+
+    private fun checkModules() {
+        val modulesToRemove = mutableListOf<Module>()
+        for (module in modules) {
+            val request = HttpRequest.newBuilder()
+                .uri(URI("http://127.0.0.1:${module.port}"))
+                .GET()
+                .build()
+            try {
+                HttpClient.newBuilder()
+                    .proxy(ProxySelector.getDefault())
+                    .build()
+                    .send(request, BodyHandlers.ofString())
+            } catch (e: Exception) {
+                modulesToRemove.add(module)
+            }
+        }
+        modules.removeAll(modulesToRemove)
     }
 }
