@@ -9,6 +9,7 @@ import su.nsk.iae.post.dsm.manager.common.Logger
 import su.nsk.iae.post.dsm.manager.requests.NewModuleRequest
 import su.nsk.iae.post.dsm.manager.responses.ModulesListResponse
 import su.nsk.iae.post.dsm.manager.responses.NewModuleResponse
+import javax.servlet.http.HttpServletRequest
 
 @RestController
 class Controller {
@@ -26,14 +27,15 @@ class Controller {
     }
 
     @PostMapping(value = ["new-module"])
-    fun newModule(@RequestBody request: NewModuleRequest): NewModuleResponse? {
+    fun newModule(@RequestBody nmr: NewModuleRequest, r: HttpServletRequest): NewModuleResponse? {
         Logger.info(Controller::class.java, "request for /new-module")
-        val dsmName = request.name
+        val dsmName = nmr.name
         if (dsmName == null) {
             Logger.info(Controller::class.java, "request should contain module name")
             return null
         }
-        return NewModuleResponse(freePort = Manager.registerModule(dsmName))
+        val dsmHost = r.remoteHost
+        return NewModuleResponse(freePort = Manager.registerModule(dsmName, dsmHost))
     }
 
     @GetMapping(value = ["modules"])

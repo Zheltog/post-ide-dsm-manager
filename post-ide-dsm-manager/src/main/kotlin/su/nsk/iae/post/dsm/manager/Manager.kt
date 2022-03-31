@@ -12,11 +12,14 @@ object Manager {
 
     private val modules: MutableList<Module> = mutableListOf()
 
-    fun registerModule(name: String): Int {
+    fun registerModule(name: String, host: String): Int {
         val freePort = ServerUtils.findFreePort()
-        val module = Module(name = name, port = freePort)
+        val module = Module(name = name, host = host, port = freePort)
         modules.add(module)
-        Logger.info(Manager.javaClass, "registered new module: name = $name, port = $freePort")
+        Logger.info(
+            Manager.javaClass,
+            "registered new module: name = $name, host = $host, port = $freePort"
+        )
         return freePort
     }
 
@@ -29,7 +32,7 @@ object Manager {
         val modulesToRemove = mutableListOf<Module>()
         for (module in modules) {
             val request = HttpRequest.newBuilder()
-                .uri(URI("http://127.0.0.1:${module.port}"))
+                .uri(URI("http://${module.host}:${module.port}"))
                 .GET()
                 .build()
             try {
