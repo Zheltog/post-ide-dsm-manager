@@ -8,7 +8,7 @@ public class Application {
 
     private static final int DEFAULT_PORT = 8080;
 	
-	public static void main(String[] args) {
+	public static void main1(String[] args) {
 		Logger.info(
 				Application.class,
 				"use -help to see available running configurations"
