@@ -1,7 +1,6 @@
 package su.nsk.iae.post.dsm.manager
 
 import su.nsk.iae.post.dsm.manager.common.Logger
-import su.nsk.iae.post.dsm.manager.common.ServerUtils
 import java.net.ProxySelector
 import java.net.URI
 import java.net.http.HttpClient
@@ -12,15 +11,13 @@ object Manager {
 
     private val modules: MutableList<Module> = mutableListOf()
 
-    fun registerModule(name: String, host: String): Int {
-        val freePort = ServerUtils.findFreePort()
-        val module = Module(name = name, host = host, port = freePort)
+    fun registerModule(name: String, host: String, port: Int) {
+        val module = Module(name = name, host = host, port = port)
         modules.add(module)
         Logger.info(
             Manager.javaClass,
-            "registered new module: name = $name, host = $host, port = $freePort"
+            "registered new module: name = $name, host = $host, port = $port"
         )
-        return freePort
     }
 
     fun getModules(): List<Module> {

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController
 import su.nsk.iae.post.dsm.manager.common.Logger
 import su.nsk.iae.post.dsm.manager.requests.NewModuleRequest
 import su.nsk.iae.post.dsm.manager.responses.ModulesListResponse
-import su.nsk.iae.post.dsm.manager.responses.NewModuleResponse
 import javax.servlet.http.HttpServletRequest
 
 @RestController
@@ -18,24 +17,23 @@ class Controller {
         Logger.info(Controller::class.java, "request for /")
         return "Hello, this is poST IDE DSM-manager<br>" +
                 "My API:<br>" +
-                "1) /new-module<br>" +
-                "request: {\"name\": \"new-dsm-name\"}<br>" +
-                "response: {\"freePort\": \"port-for-your-dsm\"}<br>" +
-                "2) /modules<br>" +
-                "request: empty<br>" +
-                "response: connected modules list<br>"
+                "TODO"
     }
 
     @PostMapping(value = ["new-module"])
-    fun newModule(@RequestBody nmr: NewModuleRequest, r: HttpServletRequest): NewModuleResponse? {
+    fun newModule(@RequestBody nmr: NewModuleRequest, r: HttpServletRequest) {
         Logger.info(Controller::class.java, "request for /new-module")
         val dsmName = nmr.name
         if (dsmName == null) {
             Logger.info(Controller::class.java, "request should contain module name")
-            return null
+            return
         }
-        val dsmHost = r.remoteHost
-        return NewModuleResponse(freePort = Manager.registerModule(dsmName, dsmHost))
+        val dsmPort = nmr.port
+        if (dsmPort == null) {
+            Logger.info(Controller::class.java, "request should contain module port")
+            return
+        }
+        Manager.registerModule(dsmName, r.remoteHost, dsmPort)
     }
 
     @GetMapping(value = ["modules"])
