@@ -3,8 +3,8 @@ Manager for PoST IDE modules
  
 # Use examples
 
-- java -jar ./post-ide-dsm-manager-1.0.0.jar -help
-- java -Dserver.port=7788 -jar ./post-ide-dsm-manager-1.0.0.jar
+- java -jar post-ide-dsm-manager-1.0-SNAPSHOT.jar -help
+- java -Dserver.port=7788 -jar post-ide-dsm-manager-1.0-SNAPSHOT.jar
 
 # Links
 
