@@ -1,11 +1,8 @@
 package su.nsk.iae.post.dsm.manager
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import su.nsk.iae.post.dsm.manager.common.Logger
+import su.nsk.iae.post.dsm.manager.requests.DsmRequestBody
 import su.nsk.iae.post.dsm.manager.requests.NewModuleRequest
 import su.nsk.iae.post.dsm.manager.responses.ModulesListResponse
 import javax.servlet.http.HttpServletRequest
@@ -40,5 +37,14 @@ class Controller {
     fun modulesList(): ModulesListResponse {
         Logger.info(Controller::class.java, "request for /modules")
         return ModulesListResponse(Manager.getModules())
+    }
+
+    @GetMapping(value = ["run/{moduleName}"])
+    fun runModule(
+        @PathVariable moduleName: String,
+        @RequestBody request: DsmRequestBody
+    ): String {
+        Logger.info(Controller::class.java, "request for /run/$moduleName")
+        return Manager.runModule(moduleName, request)
     }
 }
