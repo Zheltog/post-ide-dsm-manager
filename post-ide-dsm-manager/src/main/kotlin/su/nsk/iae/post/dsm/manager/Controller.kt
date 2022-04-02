@@ -39,7 +39,7 @@ class Controller {
         return ModulesListResponse(Manager.getModules())
     }
 
-    @GetMapping(value = ["run/{moduleName}"])
+    @PostMapping(value = ["run/{moduleName}"])
     fun runModule(
         @PathVariable moduleName: String,
         @RequestBody request: DsmRequestBody
