@@ -29,6 +29,8 @@ object Manager {
     }
 
     fun runModule(moduleName: String, requestBody: DsmRequestBody): String {
+        checkModules()
+
         val requestBodyJsonStr = requestBody.toJsonString()
 
         Logger.info(
