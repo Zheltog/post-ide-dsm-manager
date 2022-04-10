@@ -2,7 +2,7 @@ package su.nsk.iae.post.dsm.manager
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import su.nsk.iae.post.dsm.manager.common.Logger
+import su.nsk.iae.post.dsm.manager.application.Logger
 
 @SpringBootApplication
 open class App

@@ -1,4 +1,4 @@
-package su.nsk.iae.post.dsm.manager.requests
+package su.nsk.iae.post.dsm.manager.infrastructure.requests
 
 import com.fasterxml.jackson.databind.ObjectMapper
 

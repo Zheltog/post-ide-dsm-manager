@@ -1,4 +1,4 @@
-package su.nsk.iae.post.dsm.manager.common
+package su.nsk.iae.post.dsm.manager.application
 
 import org.apache.log4j.Logger.*
 
