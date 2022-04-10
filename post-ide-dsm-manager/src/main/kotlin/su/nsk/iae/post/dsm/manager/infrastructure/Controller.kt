@@ -52,7 +52,7 @@ class Controller {
         Logger.info(Controller::class.java, "request for /run/$moduleName")
         val result =  Manager.runModule(
             moduleName = moduleName,
-            requestBody = requestBody,
+            request = requestBody.toJsonString(),
             isModuleAlive = ViaHttp.isModuleAlive,
             runModule = ViaHttp.runModule
         )

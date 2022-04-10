@@ -1,7 +1,6 @@
 package su.nsk.iae.post.dsm.manager.application
 
 import su.nsk.iae.post.dsm.manager.domain.Module
-import su.nsk.iae.post.dsm.manager.infrastructure.requests.DsmRequestBody
 import kotlin.Result.Companion.failure
 
 object Manager {
@@ -24,9 +23,9 @@ object Manager {
 
     fun runModule(
         moduleName: String,
-        requestBody: DsmRequestBody,
+        request: String,
         isModuleAlive: (Module) -> Boolean,
-        runModule: (Module, DsmRequestBody) -> Result<String>
+        runModule: (Module, String) -> Result<String>
     ): Result<String> {
         val module = modules.firstOrNull { it.name == moduleName }
             ?: return failure(Exception("Module not found"))
@@ -36,7 +35,7 @@ object Manager {
             return failure(Exception("Module disconnected"))
         }
 
-        return runModule(module, requestBody)
+        return runModule(module, request)
     }
 
     private fun removeDeadModules(isModuleAlive: (Module) -> Boolean) {

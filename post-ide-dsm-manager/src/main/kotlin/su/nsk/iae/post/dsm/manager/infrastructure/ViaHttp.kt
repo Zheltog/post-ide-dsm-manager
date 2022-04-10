@@ -3,7 +3,6 @@ package su.nsk.iae.post.dsm.manager.infrastructure
 import su.nsk.iae.post.dsm.manager.application.Logger
 import su.nsk.iae.post.dsm.manager.application.Manager
 import su.nsk.iae.post.dsm.manager.domain.Module
-import su.nsk.iae.post.dsm.manager.infrastructure.requests.DsmRequestBody
 import java.net.ProxySelector
 import java.net.URI
 import java.net.http.HttpClient
@@ -30,18 +29,16 @@ object ViaHttp {
         }
     }
 
-    val runModule: (Module, DsmRequestBody) -> Result<String> = { module, requestBody ->
-        val requestBodyJsonStr = requestBody.toJsonString()
-
+    val runModule: (Module, String) -> Result<String> = { module, request ->
         Logger.info(
             Manager.javaClass,
-            "running module ${module.name} with request-body $requestBodyJsonStr"
+            "running module ${module.name} with request $request"
         )
 
         val request = HttpRequest.newBuilder()
             .uri(URI("http://${module.host}:${module.port}/run"))
             .headers("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(requestBody.toJsonString()))
+            .POST(HttpRequest.BodyPublishers.ofString(request))
             .build()
 
         try {
