@@ -3,6 +3,8 @@ package su.nsk.iae.post.dsm.manager.application
 import com.fasterxml.jackson.databind.ObjectMapper
 import su.nsk.iae.post.dsm.manager.domain.AvailableModules
 import su.nsk.iae.post.dsm.manager.domain.Module
+import java.io.File
+import java.io.FileInputStream
 import kotlin.Result.Companion.failure
 
 object Manager {
@@ -41,10 +43,14 @@ object Manager {
         return runModule(module, request)
     }
 
-    fun readAvailableModules() {
+    fun readAvailableModules(availableModulesJson: String?) {
         logInfo("getting available modules")
         val mapper = ObjectMapper()
-        val input = Manager.javaClass.getResourceAsStream("/available-modules.json")
+        val input =
+            if (availableModulesJson == null)
+                Manager.javaClass.getResourceAsStream("/available-modules.json")
+            else
+                FileInputStream(File(availableModulesJson))
         if (input == null) {
             logError("could not get available modules")
             return

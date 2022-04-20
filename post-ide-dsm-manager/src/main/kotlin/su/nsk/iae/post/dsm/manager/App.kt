@@ -13,18 +13,30 @@ fun main(args: Array<String>) {
         App::class.java,
         "use -help to see available running configurations"
     )
-    for (arg in args) {
-        if ("-help" == arg) {
+    var availableModulesJson: String? = null
+    var startAvailableModules = true
+    for (i in args.indices) {
+        if ("-help" == args[i]) {
             help()
             return
         }
+        if ("-am" == args[i]) {
+            availableModulesJson = args[i+1]
+        }
+        if ("-dsam" == args[i]) {
+            startAvailableModules = false
+        }
     }
-    Manager.readAvailableModules()
     runApplication<App>(*args)
-    Manager.startAvailableModules()
+    if (startAvailableModules) {
+        Manager.readAvailableModules(availableModulesJson)
+        Manager.startAvailableModules()
+    }
 }
 
 private fun help() {
     Logger.info(App::class.java, "available running configurations:")
-    Logger.info(App::class.java, "java -Dserver.port=<port-number> -jar <jar-name>")
+    Logger.info(App::class.java, "java -Dserver.port=<port-number> -jar <jar name>")
+    Logger.info(App::class.java, "java -jar <jar name> -am <available-modules.json filepath> (taking from resource folder by default)")
+    Logger.info(App::class.java, "java -jar <jar name> -dsam (don't start available modules)")
 }
