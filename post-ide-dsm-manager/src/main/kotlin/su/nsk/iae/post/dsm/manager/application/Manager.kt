@@ -5,6 +5,8 @@ import su.nsk.iae.post.dsm.manager.domain.AvailableModules
 import su.nsk.iae.post.dsm.manager.domain.Module
 import java.io.File
 import java.io.FileInputStream
+import java.net.InetAddress
+import java.util.*
 import kotlin.Result.Companion.failure
 
 object Manager {
@@ -61,10 +63,18 @@ object Manager {
 
     fun startAvailableModules() {
         logInfo("starting available modules")
+        val mHost = InetAddress.getLocalHost().hostAddress
+        val properties = Properties()
+        properties.load(Manager.javaClass.classLoader
+            .getResourceAsStream("application.properties"))
+        val mPort = properties.getProperty("server.port")
+        val managerAddress = "http://$mHost:$mPort"
         val dir = availableModules.directory
         availableModules.modulesJarNames?.forEach {
-            logInfo("starting $it")
-            Runtime.getRuntime().exec("java -jar $dir$it.jar")
+            logInfo("starting $it with -ma $managerAddress")
+            Runtime.getRuntime().exec(
+                "java -jar $dir$it.jar -ma $managerAddress"
+            )
         }
     }
 
