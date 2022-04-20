@@ -3,6 +3,7 @@ package su.nsk.iae.post.dsm.manager
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import su.nsk.iae.post.dsm.manager.application.Logger
+import su.nsk.iae.post.dsm.manager.application.Manager
 
 @SpringBootApplication
 open class App
@@ -18,7 +19,9 @@ fun main(args: Array<String>) {
             return
         }
     }
+    Manager.readAvailableModules()
     runApplication<App>(*args)
+    Manager.startAvailableModules()
 }
 
 private fun help() {
