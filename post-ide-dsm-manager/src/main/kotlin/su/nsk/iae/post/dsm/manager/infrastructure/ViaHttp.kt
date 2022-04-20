@@ -35,7 +35,7 @@ object ViaHttp {
             "running module ${module.name} with request $request"
         )
 
-        val request = HttpRequest.newBuilder()
+        val req = HttpRequest.newBuilder()
             .uri(URI("http://${module.host}:${module.port}/run"))
             .headers("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(request))
@@ -45,7 +45,7 @@ object ViaHttp {
             val response: HttpResponse<String> = HttpClient.newBuilder()
                 .proxy(ProxySelector.getDefault())
                 .build()
-                .send(request, HttpResponse.BodyHandlers.ofString())
+                .send(req, HttpResponse.BodyHandlers.ofString())
 
             success(response.body())
         } catch (e: Exception) {

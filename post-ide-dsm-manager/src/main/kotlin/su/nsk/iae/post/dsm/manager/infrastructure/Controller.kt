@@ -1,15 +1,15 @@
 package su.nsk.iae.post.dsm.manager.infrastructure
 
+import com.google.gson.Gson
 import org.springframework.web.bind.annotation.*
 import su.nsk.iae.post.dsm.manager.application.Logger
 import su.nsk.iae.post.dsm.manager.application.Manager
 import su.nsk.iae.post.dsm.manager.infrastructure.api.DsmManagerApi
-import su.nsk.iae.post.dsm.manager.infrastructure.requests.DsmRequestBody
 import su.nsk.iae.post.dsm.manager.infrastructure.requests.NewModuleRequestBody
 import su.nsk.iae.post.dsm.manager.infrastructure.responses.ModulesListContent
+import su.nsk.iae.post.dsm.manager.infrastructure.responses.ResponseBody
 import su.nsk.iae.post.dsm.manager.infrastructure.responses.ResponseCode.ERROR
 import su.nsk.iae.post.dsm.manager.infrastructure.responses.ResponseCode.OK
-import su.nsk.iae.post.dsm.manager.infrastructure.responses.ResponseBody
 import javax.servlet.http.HttpServletRequest
 
 @RestController
@@ -47,12 +47,12 @@ class Controller {
     @PostMapping(value = ["run/{moduleName}"])
     fun runModule(
         @PathVariable moduleName: String,
-        @RequestBody requestBody: DsmRequestBody
+        @RequestBody requestBody: LinkedHashMap<String, Any>
     ): ResponseBody {
         Logger.info(Controller::class.java, "request for /run/$moduleName")
         val result =  Manager.runModule(
             moduleName = moduleName,
-            request = requestBody.toJsonString(),
+            request = Gson().toJson(requestBody, Map::class.java),
             isModuleAlive = ViaHttp.isModuleAlive,
             runModule = ViaHttp.runModule
         )
@@ -62,4 +62,6 @@ class Controller {
             ResponseBody(OK, result.getOrNull())
         }
     }
+
+
 }
