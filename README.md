@@ -4,7 +4,8 @@ Manager for PoST IDE modules
 # Use examples
 
 - java -jar post-ide-dsm-manager-1.0-SNAPSHOT.jar -help
-- java -Dserver.port=7788 -jar post-ide-dsm-manager-1.0-SNAPSHOT.jar
+- java -jar post-ide-dsm-manager-1.0-SNAPSHOT.jar -sam
+- java -jar post-ide-dsm-manager-1.0-SNAPSHOT.jar -am /path/available-modules.json -sam
 
 # Links
 
