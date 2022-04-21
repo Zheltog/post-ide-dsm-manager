@@ -5,7 +5,7 @@ Manager for PoST IDE modules
 
 - java -jar post-ide-dsm-manager-1.0-SNAPSHOT.jar -help
 - java -jar post-ide-dsm-manager-1.0-SNAPSHOT.jar -sam
-- java -jar post-ide-dsm-manager-1.0-SNAPSHOT.jar -am /path/available-modules.json -sam
+- java -jar post-ide-dsm-manager-1.0-SNAPSHOT.jar -amj /path/available-modules.json -sam
 
 # Links
 
