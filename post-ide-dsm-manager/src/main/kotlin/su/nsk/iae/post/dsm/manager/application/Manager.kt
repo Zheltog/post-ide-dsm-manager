@@ -3,9 +3,10 @@ package su.nsk.iae.post.dsm.manager.application
 import com.fasterxml.jackson.databind.ObjectMapper
 import su.nsk.iae.post.dsm.manager.domain.AvailableModules
 import su.nsk.iae.post.dsm.manager.domain.Module
-import java.io.File
-import java.io.FileInputStream
+import java.io.*
 import java.net.InetAddress
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets.UTF_8
 import java.util.*
 import kotlin.Result.Companion.failure
 
@@ -69,12 +70,23 @@ object Manager {
             .getResourceAsStream("application.properties"))
         val mPort = properties.getProperty("server.port")
         val managerAddress = "http://$mHost:$mPort"
-        val dir = availableModules.directory
+        val dir = availableModules.directory ?: ""
         availableModules.modulesJarNames?.forEach {
-            logInfo("starting $it with -ma $managerAddress")
-            Runtime.getRuntime().exec(
+            logInfo("starting $dir$it.jar with -ma $managerAddress")
+            val process = Runtime.getRuntime().exec(
                 "java -jar $dir$it.jar -ma $managerAddress"
             )
+            val errorIS: InputStream = process.errorStream
+            val errorText = StringBuilder()
+            val reader = BufferedReader(InputStreamReader(
+                errorIS, Charset.forName(UTF_8.name())
+            ))
+            var c = 0
+            while (c != -1) {
+                c = reader.read()
+                errorText.append(c.toChar())
+            }
+            logError(errorText.toString())
         }
     }
 
