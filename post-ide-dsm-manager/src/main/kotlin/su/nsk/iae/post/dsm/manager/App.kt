@@ -29,8 +29,7 @@ fun main(args: Array<String>) {
     }
     runApplication<App>(*args)
     if (startAvailableModules) {
-        Manager.readAvailableModules(availableModulesJson)
-        Manager.startAvailableModules()
+        Manager.startAvailableModules(availableModulesJson)
     }
 }
 

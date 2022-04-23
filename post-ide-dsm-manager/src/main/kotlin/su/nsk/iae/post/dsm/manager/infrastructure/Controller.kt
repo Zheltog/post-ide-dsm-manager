@@ -6,7 +6,8 @@ import su.nsk.iae.post.dsm.manager.application.Logger
 import su.nsk.iae.post.dsm.manager.application.Manager
 import su.nsk.iae.post.dsm.manager.infrastructure.api.DsmManagerApi
 import su.nsk.iae.post.dsm.manager.infrastructure.requests.NewModuleRequestBody
-import su.nsk.iae.post.dsm.manager.infrastructure.responses.ModulesListContent
+import su.nsk.iae.post.dsm.manager.infrastructure.responses.AliveModulesContent
+import su.nsk.iae.post.dsm.manager.infrastructure.responses.AvailableModulesContent
 import su.nsk.iae.post.dsm.manager.infrastructure.responses.ResponseBody
 import su.nsk.iae.post.dsm.manager.infrastructure.responses.ResponseCode.ERROR
 import su.nsk.iae.post.dsm.manager.infrastructure.responses.ResponseCode.OK
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest
 
 @RestController
 class Controller {
+
     @RequestMapping(value = [""])
     fun hello(): String {
         Logger.info(Controller::class.java, "request for /")
@@ -38,10 +40,16 @@ class Controller {
         Manager.registerModule(dsmName, r.remoteHost, dsmPort)
     }
 
-    @GetMapping(value = ["modules"])
-    fun modulesList(): ResponseBody {
-        Logger.info(Controller::class.java, "request for /modules")
-        return ResponseBody(OK, ModulesListContent(Manager.getModules(ViaHttp.isModuleAlive)))
+    @GetMapping(value = ["alive-modules"])
+    fun aliveModules(): ResponseBody {
+        Logger.info(Controller::class.java, "request for /alive-modules")
+        return ResponseBody(OK, AliveModulesContent(Manager.getAliveModules(ViaHttp.isModuleAlive)))
+    }
+
+    @GetMapping(value = ["available-modules"])
+    fun availableModules(): ResponseBody {
+        Logger.info(Controller::class.java, "request for /available-modules")
+        return ResponseBody(OK, AvailableModulesContent(Manager.getAvailableModules()))
     }
 
     @PostMapping(value = ["run/{moduleName}"])
@@ -50,18 +58,37 @@ class Controller {
         @RequestBody requestBody: LinkedHashMap<String, Any>
     ): ResponseBody {
         Logger.info(Controller::class.java, "request for /run/$moduleName")
-        val result =  Manager.runModule(
+        return resultToResponse(Manager.runModule(
             moduleName = moduleName,
             request = Gson().toJson(requestBody, Map::class.java),
             isModuleAlive = ViaHttp.isModuleAlive,
             runModule = ViaHttp.runModule
-        )
-        return if (result.isFailure) {
-            ResponseBody(ERROR, result.exceptionOrNull()?.message)
-        } else {
-            ResponseBody(OK, result.getOrNull())
-        }
+        ))
     }
 
+    @GetMapping(value = ["start-all"])
+    fun startModules(): ResponseBody {
+        Logger.info(Controller::class.java, "request for /start-all")
+        return resultToResponse(Manager.startAvailableModules(null))
+    }
 
+    @GetMapping(value = ["start/{moduleName}"])
+    fun startModule(
+        @PathVariable moduleName: String,
+    ): ResponseBody {
+        Logger.info(Controller::class.java, "request for /start/$moduleName")
+        return resultToResponse(Manager.startModule(moduleName, null))
+    }
+
+    @GetMapping(value = ["stop/{moduleName}"])
+    fun stopModule(
+        @PathVariable moduleName: String,
+    ): ResponseBody {
+        Logger.info(Controller::class.java, "request for /stop/$moduleName")
+        return resultToResponse(Manager.stopModule(moduleName, ViaHttp.stopModule))
+    }
+
+    private fun resultToResponse(result: Result<String>) =
+        if (result.isFailure) ResponseBody(ERROR, result.exceptionOrNull()?.message)
+        else ResponseBody(OK, result.getOrNull())
 }

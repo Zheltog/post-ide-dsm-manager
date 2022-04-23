@@ -6,8 +6,12 @@ import su.nsk.iae.post.dsm.manager.infrastructure.api.ApiMethod.POST
 object DsmManagerApi {
 
     private val api = listOf(
-        ApiEntry(GET, "/modules", "empty", "alive modules list"),
+        ApiEntry(GET, "/alive-modules", "empty", "alive modules list"),
+        ApiEntry(GET, "/available-modules", "empty", "available modules list"),
         ApiEntry(POST, "/new-module", "module description", "empty"),
+        ApiEntry(GET, "/start-all", "empty", "result"),
+        ApiEntry(GET, "/start/{moduleName}", "empty", "result"),
+        ApiEntry(GET, "/stop/{moduleName}", "empty", "result"),
         ApiEntry(POST, "/run/{moduleName}", "request for module", "result")
     )
 

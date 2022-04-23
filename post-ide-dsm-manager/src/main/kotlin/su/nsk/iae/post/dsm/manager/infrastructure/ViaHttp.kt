@@ -52,4 +52,28 @@ object ViaHttp {
             failure(e)
         }
     }
+
+    val stopModule: (Module) -> Result<String> = { module ->
+        Logger.info(
+            Manager.javaClass,
+            "stopping module ${module.name}"
+        )
+
+        val req = HttpRequest.newBuilder()
+            .uri(URI("http://${module.host}:${module.port}/stop"))
+            .headers("Content-Type", "application/json")
+            .GET()
+            .build()
+
+        try {
+            val response: HttpResponse<String> = HttpClient.newBuilder()
+                .proxy(ProxySelector.getDefault())
+                .build()
+                .send(req, HttpResponse.BodyHandlers.ofString())
+
+            success(response.body())
+        } catch (e: Exception) {
+            failure(e)
+        }
+    }
 }
