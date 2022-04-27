@@ -13,7 +13,7 @@ import kotlin.Result.Companion.success
 
 object Manager {
 
-    private val managerAddress = "http://${InetAddress.getLocalHost().hostAddress}:${getManagerPort()}"
+    var managerPort: Int? = null
 
     private var availableModules: AvailableModules? = null
     private val aliveModules: MutableList<Module> = mutableListOf()
@@ -82,6 +82,7 @@ object Manager {
         if (am.modulesJarNames?.contains(moduleName) != true) {
             return failure(Exception("module $moduleName is not available"))
         }
+        val managerAddress = getManagerAddress()
         logInfo("starting $dir$moduleName.jar with -ma $managerAddress")
         val process = Runtime.getRuntime().exec(
             "java -jar $dir$moduleName.jar -ma $managerAddress"
@@ -143,7 +144,14 @@ object Manager {
         })
     }
 
+    private fun getManagerAddress(): String =
+        "http://${InetAddress.getLocalHost().hostAddress}:${getManagerPort()}"
+
     private fun getManagerPort(): Int {
+        val port = managerPort
+        if (port != null) {
+            return port
+        }
         val properties = Properties()
         properties.load(Manager.javaClass.classLoader
             .getResourceAsStream("application.properties"))
